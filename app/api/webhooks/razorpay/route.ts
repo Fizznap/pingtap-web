@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
                     console.error('Database Insert Error:', error);
                 } else {
                     console.log('Payment recorded in database');
-                    // TODO: Here we would also update Subscription status and Generate Invoice
+                    // Future: Update Subscription status and Generate Invoice (Post-MVP)
                 }
             }
         } else if (event.event === 'payment.failed') {

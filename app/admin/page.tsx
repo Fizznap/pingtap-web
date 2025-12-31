@@ -45,7 +45,7 @@ export default async function AdminDashboardPage() {
         .order('created_at', { ascending: false })
         .limit(5);
 
-    const activeTechs = 0; // Not implemented
+
 
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -60,6 +60,13 @@ export default async function AdminDashboardPage() {
                         <span className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></span>
                         System Online
                     </span>
+                </div>
+            </div>
+
+            {/* Task 2: Admin Role Bootstrap Safety Warning */}
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-3 rounded-lg flex items-center gap-3">
+                <div className="text-xs text-yellow-800 dark:text-yellow-200">
+                    <span className="font-bold">Security Note:</span> Admin roles are assigned manually in the database. There is no UI for promoting users to Admin.
                 </div>
             </div>
 
@@ -82,15 +89,13 @@ export default async function AdminDashboardPage() {
                 <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm opacity-60">
                     <div className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Active Techs</div>
                     <div className="flex justify-between items-end">
-                        <h2 className="text-3xl font-bold text-slate-900 dark:text-white">{activeTechs}</h2>
-                        <span className="text-xs text-slate-400 font-medium ml-2">(Coming Soon)</span>
+                        <h2 className="text-3xl font-bold text-slate-900 dark:text-white">--</h2>
                     </div>
                 </div>
                 <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm opacity-60">
                     <div className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Avg Resolution</div>
                     <div className="flex justify-between items-end">
                         <h2 className="text-3xl font-bold text-slate-900 dark:text-white">--</h2>
-                        <span className="text-xs text-slate-400 font-medium ml-2">(Coming Soon)</span>
                     </div>
                 </div>
             </div>

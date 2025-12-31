@@ -89,7 +89,7 @@ export default function InstallationScheduler({
                     </div>
                     <div className="flex items-center gap-3 pt-2 border-t border-slate-200 dark:border-slate-700">
                         <div className={`h-2.5 w-2.5 rounded-full ${existingInstallation.status === 'completed' ? 'bg-green-500' :
-                                existingInstallation.status === 'confirmed' ? 'bg-blue-500' : 'bg-yellow-500'
+                            existingInstallation.status === 'confirmed' ? 'bg-blue-500' : 'bg-yellow-500'
                             }`} />
                         <p className="text-sm font-medium capitalize text-slate-600 dark:text-slate-300">
                             Status: {existingInstallation.status}
@@ -122,67 +122,12 @@ export default function InstallationScheduler({
                 <p className="text-sm text-slate-500 mt-1">Select a convenient date and time for our technician to visit.</p>
             </div>
 
-            <div className="p-6 space-y-6">
-                {/* Date Selection */}
-                <div>
-                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Select Date</label>
-                    <input
-                        type="date"
-                        value={selectedDate}
-                        min={new Date().toISOString().split('T')[0]}
-                        onChange={(e) => {
-                            setSelectedDate(e.target.value);
-                            setSelectedSlot(null);
-                        }}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                    />
+            <div className="p-12 text-center text-slate-500">
+                <div className="h-16 w-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Clock className="h-8 w-8 text-slate-400" />
                 </div>
-
-                {/* Slot Selection */}
-                <div>
-                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Available Slots</label>
-                    {loading ? (
-                        <div className="flex items-center justify-center p-8 bg-slate-50 dark:bg-slate-800 rounded-xl">
-                            <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {slots.map((slot) => (
-                                <button
-                                    key={slot}
-                                    onClick={() => setSelectedSlot(slot)}
-                                    className={`p-3 rounded-xl border text-sm font-medium transition-all ${selectedSlot === slot
-                                            ? 'bg-blue-600 border-blue-600 text-white shadow-md'
-                                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-blue-300'
-                                        }`}
-                                >
-                                    {slot}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {/* Error Message */}
-                {error && (
-                    <div className="p-3 bg-red-50 dark:bg-red-900/10 text-red-600 text-sm rounded-lg flex items-center gap-2">
-                        <AlertCircle className="h-4 w-4" />
-                        {error}
-                    </div>
-                )}
-
-                {/* Submit Button */}
-                <button
-                    onClick={handleSchedule}
-                    disabled={!selectedSlot || submitting}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:shadow-none transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-                >
-                    {submitting ? (
-                        <>
-                            <Loader2 className="h-5 w-5 animate-spin" /> Scheduling...
-                        </>
-                    ) : 'Confirm Schedule'}
-                </button>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Scheduling Unavailable</h3>
+                <p className="max-w-xs mx-auto mt-2">Online scheduling is currently paused. Please wait for our team to contact you.</p>
             </div>
         </div>
     );

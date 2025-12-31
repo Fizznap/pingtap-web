@@ -3,6 +3,8 @@ export const dynamic = 'force-dynamic';
 import { cookies } from 'next/headers';
 import BillingContent from './BillingContent';
 
+import { Payment } from '@/types/app';
+
 export default async function BillingPage() {
     const cookieStore = await cookies();
     const supabase = createServerClient(
@@ -24,7 +26,7 @@ export default async function BillingPage() {
 
     // Default Empty Props
     let profile = { full_name: 'Customer', address: 'N/A', email: '' }; // Fallback safe
-    let payments: any[] = [];
+    let payments: Payment[] = [];
     let subscription = null;
 
     if (user) {
@@ -69,23 +71,21 @@ export default async function BillingPage() {
                 )
             `)
             .eq('customer_id', user.id)
-            .eq('customer_id', user.id)
             .order('created_at', { ascending: false })
             .limit(1)
             .single();
 
         if (sub) {
-            // Transform for prop shape
+            // Transform for prop shape safely
+            const planData = Array.isArray(sub.plans) ? sub.plans[0] : sub.plans;
+
             subscription = {
                 id: sub.id,
                 end_date: sub.end_date,
                 status: sub.status,
-                // @ts-ignore
-                plan: sub.plans ? {
-                    // @ts-ignore
-                    name: sub.plans.name,
-                    // @ts-ignore
-                    price_monthly: sub.plans.price_monthly
+                plan: planData ? {
+                    name: planData.name,
+                    price_monthly: planData.price_monthly
                 } : null
             };
         }
@@ -98,11 +98,11 @@ export default async function BillingPage() {
         .eq('is_active', true)
         .order('price_monthly', { ascending: true });
 
-    console.log('[BillingDebug] Plans Fetch:', {
-        plansCount: plans?.length,
-        user: user?.id,
-        error: plans ? 'None' : 'Plans Data is Null'
-    });
+    // console.log('[BillingDebug] Plans Fetch:', {
+    //     plansCount: plans?.length,
+    //     user: user?.id,
+    //     error: plans ? 'None' : 'Plans Data is Null'
+    // });
 
     const paymentsEnabled = process.env.PAYMENTS_ENABLED === 'true';
 

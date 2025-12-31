@@ -50,7 +50,7 @@ export async function createTicket(subject: string, description: string, categor
         // For now, using a placeholder check or skipping if phone not strictly verified
         // const phone = user.phone || user.user_metadata?.phone;
 
-        // TODO: Call WhatsApp API here. 
+        // Future: Call WhatsApp API here. 
         // If it fails, we catch/log but DO NOT revert the ticket.
     } catch (waError) {
         console.warn('WhatsApp Notification Failed:', waError);

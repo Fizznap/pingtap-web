@@ -152,10 +152,8 @@ export function PlanTable() {
                             <tr>
                                 <td className="p-6"></td>
                                 {plans.map((plan) => (
-                                    <td key={plan.name} className={cn("p-6 text-center", plan.recommended ? "bg-primary/5 dark:bg-primary/10" : "")}>
-                                        <Button variant={plan.recommended ? "primary" : "outline"} className="w-full">
-                                            Choose {plan.name}
-                                        </Button>
+                                    <td key={plan.name} className={cn("p-6 text-center text-xs text-text-tertiary", plan.recommended ? "bg-primary/5 dark:bg-primary/10" : "")}>
+                                        View only
                                     </td>
                                 ))}
                             </tr>

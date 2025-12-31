@@ -24,7 +24,10 @@ export default function techniciansPage() {
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Field Technicians</h1>
                     <p className="text-slate-500 text-sm">Manage your on-ground workforce.</p>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold shadow-sm transition-colors">
+                <button
+                    disabled
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-300 dark:bg-slate-700 text-slate-500 rounded-lg font-bold shadow-sm cursor-not-allowed"
+                >
                     <Plus className="h-4 w-4" />
                     Add Technician
                 </button>

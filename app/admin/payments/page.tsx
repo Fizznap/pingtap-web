@@ -1,3 +1,4 @@
+import { Payment } from '@/types/app';
 import { createClient } from '@supabase/supabase-js';
 import { CheckCircle, Clock, XCircle, AlertCircle, IndianRupee, CreditCard, Search, Filter, Download, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 
@@ -28,13 +29,17 @@ export default async function AdminPaymentsPage() {
     // 2. Fetch Payments joining with Profiles (if possible) or Users
     // NOTE: 'auth.users' is not directly joinable via standard client unless using RPC or View.
     // However, we have a 'profiles' table that maps 1:1 to users.
-    const { data: payments, error } = await supabase
+    // However, we have a 'profiles' table that maps 1:1 to users.
+
+    const { data: rawPayments, error } = await supabase
         .from('payments')
         .select(`
-    *,
-    profiles: user_id(full_name, email)
+            *,
+            profiles: user_id(full_name, email)
         `)
         .order('created_at', { ascending: false });
+
+    const payments = rawPayments as unknown as Payment[];
 
     if (error) {
         console.error('Admin Payments Fetch Error:', error);
@@ -100,10 +105,12 @@ export default async function AdminPaymentsPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div>
-                                                {/* @ts-ignore - profiles is joined array or object depending on relationship */}
-                                                <p className="font-medium text-slate-900 dark:text-white">{payment.profiles?.full_name || 'Unknown User'}</p>
-                                                {/* @ts-ignore */}
-                                                <p className="text-xs text-slate-500">{payment.profiles?.email || 'No Email'}</p>
+                                                <p className="font-medium text-slate-900 dark:text-white">
+                                                    {(Array.isArray(payment.profiles) ? payment.profiles[0] : payment.profiles)?.full_name || 'Unknown User'}
+                                                </p>
+                                                <p className="text-xs text-slate-500">
+                                                    {(Array.isArray(payment.profiles) ? payment.profiles[0] : payment.profiles)?.email || 'No Email'}
+                                                </p>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">

@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 const sidebarItems = [
     { icon: LayoutDashboard, label: 'Overview', href: '/admin' },
     { icon: Ticket, label: 'Tickets Queue', href: '/admin/tickets' },
+    { icon: Users, label: 'Subscriptions', href: '/admin/subscriptions' }, // Task 1
     { icon: Calendar, label: 'Installations', href: '/admin/installations' },
     { icon: Users, label: 'Technicians', href: '/admin/technicians' },
     { icon: Banknote, label: 'Payments', href: '/admin/payments' },

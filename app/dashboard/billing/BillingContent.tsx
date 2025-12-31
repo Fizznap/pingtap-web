@@ -4,19 +4,10 @@ import { useState } from 'react';
 import { CreditCard, Download, Clock, AlertCircle, ChevronRight, Lock, Loader2, Calendar, Smartphone, Building2, Wallet, Info } from 'lucide-react';
 import Script from 'next/script';
 import { createOrderAction, createSubscriptionAndOrder, verifyPaymentSignature } from '@/app/actions/razorpay';
+import { Payment, Subscription as AppSubscription } from '@/types/app';
 import { createSubscription } from '@/app/actions/subscription'; // New Action
 import { Button } from '@/components/ui/Button';
 import { generateInvoicePDF } from '@/lib/invoice';
-
-type PaymentRecord = {
-    id: string;
-    amount: number;
-    currency: string;
-    status: string;
-    created_at: string;
-    provider_payment_id: string | null;
-    method: string | null;
-};
 
 type PaymentMethod = 'card' | 'upi' | 'netbanking' | 'wallet';
 
@@ -26,31 +17,39 @@ type UserProfile = {
     email: string;
 };
 
-type Subscription = {
-    id: string;
-    end_date: string;
-    status: string;
-    plan: {
-        name: string;
-        price_monthly: number;
-    } | null;
-};
+// Use the imported Subscription type or keep local if they differ significantly.
+// Looking at local Subscription:
+// type Subscription = { id: string; end_date: string; status: string; plan: { name: string; price_monthly: number; } | null; };
+// AppSubscription: { ... plans?: Plan } -> Plan has name, price_monthly.
+// The local Subscription type is slightly different in structure (nested plan object vs plans join).
+// I will keep Subscription local but rename it or map it if needed. 
+// Actually current code maps it: subscription = { ..., plan: { name... } }
+// So the local Subscription type is accurate for the PROP. 
+// I will just replace PaymentRecord with Payment.
 
 type BillingContentProps = {
     profile: UserProfile;
-    payments: PaymentRecord[];
-    subscription: Subscription | null;
+    payments: Payment[];
+    subscription: {
+        id: string;
+        end_date: string;
+        status: string;
+        plan: {
+            name: string;
+            price_monthly: number;
+        } | null;
+    } | null;
     availablePlans: any[];
     paymentsEnabled: boolean;
 };
 
 export default function BillingContent({ profile, payments, subscription, availablePlans, paymentsEnabled }: BillingContentProps) {
-    const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('card');
     const [isPaymentLoading, setIsPaymentLoading] = useState(false);
+
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [selectedPlanForPurchase, setSelectedPlanForPurchase] = useState<any>(null);
 
-    const handleDownloadInvoice = (record: PaymentRecord) => {
+    const handleDownloadInvoice = (record: Payment) => {
         if (!profile) return;
 
         let addressStr = 'N/A';
@@ -82,123 +81,10 @@ export default function BillingContent({ profile, payments, subscription, availa
     };
 
     const handlePayment = async () => {
-        // Mode 1: Manual Subscription (Payments Restricted/Disabled for this flow)
-        if (!paymentsEnabled) {
-            let planToPay = null;
-            if (selectedPlanForPurchase) {
-                planToPay = selectedPlanForPurchase;
-            } else if (subscription && subscription.plan) {
-                setErrorMessage("Renewals are not supported in this view-only mode.");
-                return;
-            } else {
-                setErrorMessage("Please select a plan to purchase.");
-                return;
-            }
-
-            setIsPaymentLoading(true);
-            setErrorMessage(null);
-
-            try {
-                const result = await createSubscription(planToPay.id);
-                if (result.error) {
-                    setErrorMessage(result.error);
-                } else {
-                    alert("Subscription Confirmed! Status: Pending Activation.");
-                    window.location.reload();
-                }
-            } catch (e: any) {
-                console.error(e);
-                setErrorMessage("System Error. Please try again.");
-            } finally {
-                setIsPaymentLoading(false);
-            }
-            return;
-        }
-
-        // Mode 2: Payment Enabled Flow (Razorpay)
-        // Kept for future reference but unreachable if paymentsEnabled=false
-        let planToPay = null;
-        let isNewSubscription = false;
-
-        if (subscription && subscription.plan) {
-            planToPay = subscription.plan;
-        } else if (selectedPlanForPurchase) {
-            planToPay = selectedPlanForPurchase;
-            isNewSubscription = true;
-        } else {
-            setErrorMessage("Please select a plan to purchase.");
-            return;
-        }
-
-        setIsPaymentLoading(true);
-        setErrorMessage(null);
-
-        try {
-            const amountToPay = planToPay.price_monthly;
-            let result;
-
-            if (isNewSubscription) {
-                result = await createSubscriptionAndOrder(planToPay.id, amountToPay);
-            } else {
-                result = await createOrderAction(amountToPay, subscription!.id);
-            }
-
-            if (result.error) {
-                setErrorMessage(result.error);
-                setIsPaymentLoading(false);
-                return;
-            }
-
-            const { orderId, amount, currency, keyId } = result;
-
-            if (!keyId) {
-                setErrorMessage('Payment gateway configuration invalid.');
-                setIsPaymentLoading(false);
-                return;
-            }
-
-            const options = {
-                key: keyId,
-                amount: amount,
-                currency: currency,
-                name: 'PingTap Broadband',
-                description: `Subscription - ${planToPay.name}`,
-                order_id: orderId,
-                handler: async function (response: any) {
-                    const verify = await verifyPaymentSignature(
-                        response.razorpay_order_id,
-                        response.razorpay_payment_id,
-                        response.razorpay_signature
-                    );
-
-                    if (verify.valid) {
-                        alert('Payment Successful!');
-                        window.location.reload();
-                    } else {
-                        setErrorMessage('Payment Verification Failed!');
-                    }
-                },
-                prefill: {
-                    name: profile?.full_name || "Customer",
-                    email: profile?.email || "customer@example.com",
-                    contact: ""
-                },
-                theme: { color: "#2563eb" }
-            };
-
-            // @ts-ignore
-            const rzp = new (window as any).Razorpay(options);
-            rzp.on('payment.failed', function (response: any) {
-                setErrorMessage('Payment Failed: ' + response.error.description);
-            });
-            rzp.open();
-
-        } catch (error: any) {
-            console.error('Payment Error:', error);
-            setErrorMessage('Something went wrong during payment initialization.');
-        } finally {
-            setIsPaymentLoading(false);
-        }
+        // Payments are strictly disabled in this view-only pass.
+        // We do not want to allow manual offline subscriptions either to avoid "fake" data creation.
+        // User must contact support to activate.
+        return;
     };
 
     const isSubscriptionActive = subscription && ['active', 'pending'].includes(subscription.status);
@@ -351,43 +237,7 @@ export default function BillingContent({ profile, payments, subscription, availa
                 </div>
 
                 {/* Payment Options (Show if Subscription Exists OR Plan Selected) */}
-                {(displaySubscription || selectedPlanForPurchase) && (
-                    <div>
-                        <h3 className="font-bold text-slate-500 text-xs uppercase tracking-wider mb-4 ml-1">Payment Options</h3>
-                        <div className="space-y-4">
-                            {/* Card Option */}
-                            <div
-                                onClick={() => setSelectedMethod('card')}
-                                className={`
-                                bg-white dark:bg-slate-900 rounded-2xl border transition-all duration-300 overflow-hidden cursor-pointer
-                                ${selectedMethod === 'card' ? 'border-blue-600 ring-4 ring-blue-50 dark:ring-blue-900/20' : 'border-slate-200 dark:border-slate-800 hover:border-blue-300'}
-                            `}
-                            >
-                                <div className="p-4 flex items-center gap-4">
-                                    <div className="h-10 w-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600">
-                                        <CreditCard className="h-5 w-5" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="font-bold text-slate-900 dark:text-white">Credit / Debit Card</p>
-                                    </div>
-                                    <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${selectedMethod === 'card' ? 'border-blue-600 bg-blue-600' : 'border-slate-300 dark:border-slate-600'}`}>
-                                        {selectedMethod === 'card' && <div className="h-2 w-2 rounded-full bg-white"></div>}
-                                    </div>
-                                </div>
 
-                                {selectedMethod === 'card' && (
-                                    <div className="px-4 pb-6 pt-2 animate-in slide-in-from-top-2">
-                                        <div className="space-y-4 opacity-100">
-                                            <div className="text-sm text-slate-500 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg flex items-center gap-2">
-                                                <Lock className="h-4 w-4" /> Secure Payment Gateway
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
 
             {/* Sticky Footer */}
@@ -400,24 +250,19 @@ export default function BillingContent({ profile, payments, subscription, availa
                         </div>
                     )}
 
-                    {!paymentsEnabled && (
-                        <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400 text-sm font-bold animate-in slide-in-from-bottom-2 bg-orange-50 dark:bg-orange-900/10 px-3 py-1.5 rounded-full">
-                            <Info className="h-4 w-4" />
-                            Payments are currently paused
-                        </div>
-                    )}
+                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-xl text-center shadow-lg mb-4">
+                        <p className="font-bold">Online payments launching soon</p>
+                        <p className="text-xs opacity-90 mt-1">To renew your subscription or change plans,<br />please visit our office or contact support.</p>
+                        <p className="text-xs font-bold mt-2 bg-white/20 inline-block px-3 py-1 rounded">Helpline: 816-925-700</p>
+                    </div>
 
                     <Button
                         size="lg"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-14 shadow-lg shadow-blue-600/20 text-lg flex items-center justify-between px-6 disabled:opacity-70 disabled:cursor-not-allowed disabled:bg-slate-400"
+                        className="w-full bg-slate-200 text-slate-500 rounded-xl h-14 text-lg flex items-center justify-center font-bold cursor-not-allowed hover:bg-slate-200"
                         onClick={handlePayment}
-                        disabled={isPaymentLoading || (!paymentsEnabled && !selectedPlanForPurchase)}
+                        disabled={true}
                     >
-                        <span>{paymentsEnabled ? 'Pay Now' : 'Confirm Plan'}</span>
-                        <div className="flex items-center gap-2 font-mono">
-                            <span className="opacity-70 text-sm">₹{planPrice}.00</span>
-                            <ChevronRight className="h-5 w-5" />
-                        </div>
+                        <span>Payments Disabled</span>
                     </Button>
 
                     <div className="flex items-center gap-1.5 text-[10px] text-green-600 font-bold uppercase tracking-wider opacity-80">

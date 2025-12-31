@@ -197,35 +197,13 @@ export function HeroSection() {
                     </div>
 
                     {/* Visual Content (Desktop Only/Enhanced) */}
-                    <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
-                        {/* Speedometer Animation / Visual Representation */}
-                        <div className="relative aspect-square w-full max-w-md mx-auto lg:mr-0">
-                            {/* Abstract Circles */}
-                            <div className="absolute inset-0 rounded-full border border-blue-500/20 animate-[spin_10s_linear_infinite]"></div>
-                            <div className="absolute inset-4 rounded-full border border-cyan-500/20 animate-[spin_15s_linear_infinite_reverse]"></div>
-                            <div className="absolute inset-8 rounded-full border border-purple-500/20 animate-[spin_20s_linear_infinite]"></div>
-
-                            {/* Center Content glassmorphism */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="relative flex flex-col items-center justify-center h-48 w-48 rounded-full bg-slate-900/50 backdrop-blur-xl border border-white/10 shadow-2xl shadow-blue-500/20">
-                                    <div className="text-5xl font-black text-white tracking-tighter">
-                                        400
-                                    </div>
-                                    <div className="text-sm font-bold text-blue-400 uppercase tracking-widest mt-1">
-                                        Mbps
-                                    </div>
-                                    <div className="absolute -bottom-6 px-4 py-1.5 rounded-lg bg-success text-white text-xs font-bold shadow-lg">
-                                        SPEEDTEST
-                                    </div>
-                                </div>
+                    <div className="relative mx-auto w-full max-w-lg lg:max-w-none flex items-center justify-center">
+                        <div className="relative flex flex-col items-center justify-center h-48 w-48 rounded-full bg-slate-900/50 backdrop-blur-xl border border-white/10 shadow-2xl shadow-blue-500/20">
+                            <div className="text-5xl font-black text-white tracking-tighter">
+                                400
                             </div>
-
-                            {/* Floating Elements */}
-                            <div className="absolute top-10 left-0 bg-slate-800/80 backdrop-blur-md p-3 rounded-xl border border-white/10 shadow-lg animate-bounce duration-[3000ms]">
-                                <Wifi className="h-6 w-6 text-blue-400" />
-                            </div>
-                            <div className="absolute bottom-20 right-0 bg-slate-800/80 backdrop-blur-md p-3 rounded-xl border border-white/10 shadow-lg animate-bounce duration-[4000ms]">
-                                <Zap className="h-6 w-6 text-amber-400" />
+                            <div className="text-sm font-bold text-blue-400 uppercase tracking-widest mt-1">
+                                Mbps
                             </div>
                         </div>
                     </div>

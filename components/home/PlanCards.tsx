@@ -138,14 +138,7 @@ export function PlanCards() {
                                 ))}
                             </ul>
 
-                            <Link href="/register" className="w-full">
-                                <Button
-                                    variant={plan.recommended ? 'primary' : 'outline'}
-                                    className="w-full"
-                                >
-                                    Select Plan
-                                </Button>
-                            </Link>
+
                         </div>
                     ))}
                 </div>

@@ -14,6 +14,11 @@ export default function ProfilePage() {
         phone: '',
         email: ''
     });
+    const [passwordData, setPasswordData] = useState({
+        newPassword: '',
+        confirmPassword: ''
+    });
+    const [updatingPassword, setUpdatingPassword] = useState(false);
 
     const router = useRouter();
     const supabase = createBrowserClient(
@@ -199,40 +204,7 @@ export default function ProfilePage() {
                     </form>
                 </div>
 
-                {/* Security Settings */}
-                <div className="space-y-6">
-                    <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <Lock className="h-5 w-5 text-blue-600" /> Security
-                    </h3>
 
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-                        <div className="flex justify-between items-center py-2">
-                            <div>
-                                <p className="font-bold text-slate-900 dark:text-white text-sm">Change Password</p>
-                                <p className="text-xs text-slate-500">Update your specialized password.</p>
-                            </div>
-                            <button className="text-blue-600 text-sm font-bold hover:underline">Update</button>
-                        </div>
-                        <div className="border-t border-slate-100 dark:border-slate-800 my-2"></div>
-                        <div className="flex justify-between items-center py-2">
-                            <div>
-                                <p className="font-bold text-slate-900 dark:text-white text-sm">Two-Factor Authentication</p>
-                                <p className="text-xs text-slate-500 mb-1">Add an extra layer of security.</p>
-                                <span className="bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded">Off</span>
-                            </div>
-                            <button className="text-slate-400 text-sm font-bold cursor-not-allowed">Enable</button>
-                        </div>
-                    </div>
-
-                    {/* Danger Zone */}
-                    <div className="bg-red-50 dark:bg-red-950/30 rounded-3xl p-6 border border-red-200 dark:border-red-900/50 shadow-sm mt-6">
-                        <h4 className="font-bold text-red-900 dark:text-red-200 text-sm mb-2">Danger Zone</h4>
-                        <p className="text-xs text-red-800 dark:text-red-300 mb-4 opacity-100">Requesting account deletion will remove all your data permanently.</p>
-                        <button className="w-full flex justify-center border border-red-300 dark:border-red-800 text-red-900 dark:text-red-200 bg-white dark:bg-transparent px-4 py-3 rounded-xl text-xs font-bold hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                            Request Account Deletion
-                        </button>
-                    </div>
-                </div>
 
             </div>
         </div>
