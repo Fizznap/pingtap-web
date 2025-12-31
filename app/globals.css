@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+:root {
+  /* Brand Colors */
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-light: #60a5fa;
+  --primary-bg: #dbeafe;
+
+  /* Secondary */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --accent: #8b5cf6;
+
+  /* Neutrals */
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-tertiary: #64748b;
+  --border: #e2e8f0;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-light: var(--primary-light);
+  --color-primary-bg: var(--primary-bg);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-accent: var(--accent);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-border: var(--border);
+  
+  --font-sans: var(--font-inter);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark mode adjustments if needed, keeping similar for now or defining dark variants */
+    --background: #0f172a;
+    --foreground: #f8fafc;
+    /* Adjust text colors for dark mode */
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --border: #334155;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+}
+
+/* Print Specific Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  #invoice-area, #invoice-area * {
+    visibility: visible;
+  }
+  
+  #invoice-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: white;
+    color: black;
+    box-shadow: none;
+    border: none;
+  }
+
+  /* Reset colors for print to save ink and ensure readability */
+  #invoice-area h1, #invoice-area h2, #invoice-area p, #invoice-area td, #invoice-area th {
+    color: black !important;
+  }
+
+  /* Hide potential dark mode backgrounds in print */
+  .dark #invoice-area {
+      background: white !important;
+      color: black !important;
+  }
+}
