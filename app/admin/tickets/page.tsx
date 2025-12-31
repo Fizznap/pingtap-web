@@ -1,5 +1,6 @@
-
 import { createServerClient } from '@supabase/ssr';
+import { CheckCircle, Search, Filter, ArrowUpRight, Clock, AlertCircle } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 import { cookies } from 'next/headers';
 import AdminTicketsClient from './AdminTicketsClient';
 

@@ -1,5 +1,6 @@
-
 import { createServerClient } from '@supabase/ssr';
+import { CheckCircle, Search, Filter, MapPin, Calendar, Clock, MoreVertical } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 import { cookies } from 'next/headers';
 import AdminInstallationsClient from './AdminInstallationsClient';
 

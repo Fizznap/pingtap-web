@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { CheckCircle, Clock, XCircle, AlertCircle, IndianRupee } from 'lucide-react';
+import { CheckCircle, Clock, XCircle, AlertCircle, IndianRupee, CreditCard, Search, Filter, Download, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 
 // Force dynamic rendering to ensure fresh data
 export const dynamic = 'force-dynamic';
@@ -31,8 +31,8 @@ export default async function AdminPaymentsPage() {
     const { data: payments, error } = await supabase
         .from('payments')
         .select(`
-            *,
-            profiles:user_id ( full_name, email )
+    *,
+    profiles: user_id(full_name, email)
         `)
         .order('created_at', { ascending: false });
 

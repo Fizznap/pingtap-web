@@ -2,6 +2,8 @@
 
 import { Activity, ArrowDown, ArrowUp, Calendar, Clock, Download, Laptop, Smartphone, Upload, Wifi } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default function UsagePage() {
     return (
         <div className="p-4 lg:p-8 max-w-5xl mx-auto space-y-8 pb-24">

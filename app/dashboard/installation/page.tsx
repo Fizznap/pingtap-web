@@ -1,5 +1,6 @@
 
 import { createServerClient } from '@supabase/ssr';
+export const dynamic = 'force-dynamic';
 import { cookies } from 'next/headers';
 import InstallationScheduler from './InstallationScheduler';
 import { ArrowLeft } from 'lucide-react';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, MapPin, Phone, Star, MoreVertical, Plus } from 'lucide-react';
+import { Users, Search, Filter, Plus, Phone, MapPin, MoreVertical } from 'lucide-react';
 
 // Initially empty state or fetched from API in future
 // For now, I'll keep it empty or minimal real-looking data as per user request to "remove fake tickets", 

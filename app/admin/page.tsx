@@ -1,5 +1,6 @@
 
 import { CheckCircle, Menu } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import Link from 'next/link';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Map } from 'lucide-react';
+import { MapPin, Navigation, Info, Layers, Map } from 'lucide-react';
 
 export default function AdminMapPage() {
     return (
