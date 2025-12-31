@@ -8,16 +8,9 @@ import { Button } from '@/components/ui/Button';
 import { ArrowRight, MapPin, Building, Home, Store, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-const THANE_AREAS = [
-    'Kasarvadavali',
-    'Ghodbunder Road',
-    'Majiwada',
-    'Manpada',
-    'Wagle Estate',
-    'Khopat',
-    'Naupada',
-    'Other'
-];
+import { checkServiceAvailability, THANE_AREAS } from '@/lib/availability';
+
+// ... (keep Step2Address exports)
 
 export function Step2Address() {
     const { formData, updateFormData, nextStep, prevStep } = useRegister();
@@ -53,22 +46,15 @@ export function Step2Address() {
         setCheckingCoverage(true);
         setCoverageStatus('idle');
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        // Mock Logic
-        const isThanePincode = selectedPincode?.startsWith('400');
-
-        if (!isThanePincode) {
-            setCoverageStatus('unavailable');
-        } else if (selectedArea === 'Wagle Estate' || selectedArea === 'Khopat') {
-            setCoverageStatus('unavailable');
-        } else if (selectedArea === 'Naupada') {
-            setCoverageStatus('limited');
-        } else {
-            setCoverageStatus('available');
+        try {
+            const status = await checkServiceAvailability(selectedPincode, selectedArea);
+            setCoverageStatus(status);
+        } catch (error) {
+            console.error('Coverage check failed', error);
+            setCoverageStatus('unavailable'); // Fail safe
+        } finally {
+            setCheckingCoverage(false);
         }
-        setCheckingCoverage(false);
     };
 
     const onSubmit = (data: AddressDetailsData) => {

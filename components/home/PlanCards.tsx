@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Check, Star } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
@@ -137,12 +138,14 @@ export function PlanCards() {
                                 ))}
                             </ul>
 
-                            <Button
-                                variant={plan.recommended ? 'primary' : 'outline'}
-                                className="w-full"
-                            >
-                                Select Plan
-                            </Button>
+                            <Link href="/register" className="w-full">
+                                <Button
+                                    variant={plan.recommended ? 'primary' : 'outline'}
+                                    className="w-full"
+                                >
+                                    Select Plan
+                                </Button>
+                            </Link>
                         </div>
                     ))}
                 </div>

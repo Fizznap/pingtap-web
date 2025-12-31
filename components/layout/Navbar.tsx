@@ -62,21 +62,27 @@ export function Navbar() {
                                 <span className="text-xs text-text-tertiary">24/7 Support</span>
                                 <span className="text-sm font-bold text-text-primary">816-925-700</span>
                             </div>
-                            <Button variant="ghost" size="sm" className="hidden lg:flex">
-                                <User className="mr-2 h-4 w-4" />
-                                Login
-                            </Button>
-                            <Button size="sm">
-                                Get Connected
-                            </Button>
+                            <Link href="/login">
+                                <Button variant="ghost" size="sm" className="hidden lg:flex">
+                                    <User className="mr-2 h-4 w-4" />
+                                    Login
+                                </Button>
+                            </Link>
+                            <Link href="/register">
+                                <Button size="sm">
+                                    Register
+                                </Button>
+                            </Link>
                         </div>
                     </div>
 
                     {/* Mobile Action (Minimal) */}
                     <div className="flex md:hidden items-center gap-2">
-                        <Button size="sm" variant="outline" className="h-8 px-3">
-                            Login
-                        </Button>
+                        <Link href="/login">
+                            <Button size="sm" variant="outline" className="h-8 px-3">
+                                Login
+                            </Button>
+                        </Link>
                     </div>
                 </div>
             </div>
