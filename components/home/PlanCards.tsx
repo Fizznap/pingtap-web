@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Check, Star } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -55,6 +56,11 @@ const plans = [
 
 export function PlanCards() {
     const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
+    const router = useRouter();
+
+    const handlePlanClick = (planName: string) => {
+        router.push(`/register?plan=${encodeURIComponent(planName)}`);
+    };
 
     return (
         <section id="plans" className="py-20 bg-gray-50 dark:bg-transparent">
@@ -138,6 +144,13 @@ export function PlanCards() {
                                 ))}
                             </ul>
 
+                            <Button
+                                onClick={() => handlePlanClick(plan.name)}
+                                variant={plan.recommended ? "primary" : "outline"}
+                                className="w-full"
+                            >
+                                Get Started
+                            </Button>
 
                         </div>
                     ))}

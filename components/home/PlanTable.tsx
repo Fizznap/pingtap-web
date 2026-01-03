@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Check, X, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
@@ -55,6 +56,11 @@ const featureLabels = [
 
 export function PlanTable() {
     const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
+    const router = useRouter();
+
+    const handlePlanClick = (planName: string) => {
+        router.push(`/register?plan=${encodeURIComponent(planName)}`);
+    };
 
     return (
         <section className="hidden lg:block py-20 bg-gray-50 dark:bg-transparent">
@@ -152,8 +158,14 @@ export function PlanTable() {
                             <tr>
                                 <td className="p-6"></td>
                                 {plans.map((plan) => (
-                                    <td key={plan.name} className={cn("p-6 text-center text-xs text-text-tertiary", plan.recommended ? "bg-primary/5 dark:bg-primary/10" : "")}>
-                                        View only
+                                    <td key={plan.name} className={cn("p-6 text-center", plan.recommended ? "bg-primary/5 dark:bg-primary/10" : "")}>
+                                        <Button
+                                            onClick={() => handlePlanClick(plan.name)}
+                                            variant={plan.recommended ? "primary" : "outline"}
+                                            className="w-full"
+                                        >
+                                            Get Started
+                                        </Button>
                                     </td>
                                 ))}
                             </tr>

@@ -1,10 +1,83 @@
 'use client';
 
-import { Activity, ArrowDown, ArrowUp, Calendar, Clock, Download, Laptop, Smartphone, Upload, Wifi } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Activity, ArrowDown, ArrowUp, Calendar, Info } from 'lucide-react';
+import { getUserUsageData } from '@/app/actions/usage';
 
 export const dynamic = 'force-dynamic';
 
+interface UsageData {
+    subscription?: {
+        id: string;
+        planName: string;
+        speed: number;
+        status: string;
+        billingCycle: string;
+        startDate: string;
+        endDate: string;
+    };
+    currentCycle?: {
+        start: string;
+        end: string;
+    };
+    usage?: {
+        totalGB: number;
+        downloadGB: number;
+        uploadGB: number;
+    };
+    hasSubscription: boolean;
+    error?: string;
+}
+
 export default function UsagePage() {
+    const [data, setData] = useState<UsageData | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchData() {
+            const result = await getUserUsageData();
+            setData(result as UsageData);
+            setLoading(false);
+        }
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="p-4 lg:p-8 max-w-5xl mx-auto flex items-center justify-center min-h-[60vh]">
+                <div className="text-center">
+                    <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+                    <p className="text-slate-500">Loading usage data...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!data?.hasSubscription) {
+        return (
+            <div className="p-4 lg:p-8 max-w-5xl mx-auto">
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-8 text-center">
+                    <Info className="h-12 w-12 text-amber-600 mx-auto mb-4" />
+                    <h2 className="text-xl font-bold text-amber-900 dark:text-amber-100 mb-2">No Active Subscription</h2>
+                    <p className="text-amber-700 dark:text-amber-300">
+                        You need an active subscription to view usage data. Please subscribe to a plan first.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    const cycleStart = data.currentCycle ? new Date(data.currentCycle.start) : new Date();
+    const cycleEnd = data.currentCycle ? new Date(data.currentCycle.end) : new Date();
+
+    const formatDate = (date: Date) => {
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    const formatMonth = (date: Date) => {
+        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    };
+
     return (
         <div className="p-4 lg:p-8 max-w-5xl mx-auto space-y-8 pb-24">
 
@@ -14,26 +87,40 @@ export default function UsagePage() {
                 <p className="text-slate-500">Track your consumption and session history.</p>
             </div>
 
+            {/* Info Notice */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-6 flex items-start gap-4">
+                <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <div>
+                    <h3 className="font-bold text-blue-900 dark:text-blue-100 mb-1">Usage Tracking Coming Soon</h3>
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                        Real-time data usage tracking will be enabled once your installation is complete and your service is active.
+                        Your plan: <span className="font-semibold">{data.subscription?.planName}</span> ({data.subscription?.speed} Mbps)
+                    </p>
+                </div>
+            </div>
+
             {/* Total Usage Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Total Consumption */}
                 <div className="md:col-span-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
                     <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
                         <div>
-                            <p className="text-blue-100 font-medium mb-1 flex items-center gap-2"><Activity className="h-4 w-4" /> Total Data Consumed</p>
-                            <h2 className="text-5xl font-bold">452.8 <span className="text-2xl opacity-80">GB</span></h2>
-                            <p className="text-sm text-blue-100 mt-2 opacity-80">Cycle: Oct 01 - Oct 31, 2023</p>
+                            <p className="text-blue-100 font-medium mb-1 flex items-center gap-2"><Activity className="h-4 w-4" /> Current Billing Cycle</p>
+                            <h2 className="text-5xl font-bold">0 <span className="text-2xl opacity-80">GB</span></h2>
+                            <p className="text-sm text-blue-100 mt-2 opacity-80">
+                                Cycle: {formatDate(cycleStart)} - {formatDate(cycleEnd)}
+                            </p>
                         </div>
 
                         {/* Split Stats */}
                         <div className="flex gap-8">
                             <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 min-w-[140px]">
                                 <p className="text-xs text-blue-100 mb-1 flex items-center gap-1"><ArrowDown className="h-3 w-3" /> Download</p>
-                                <p className="text-2xl font-bold">410.2 GB</p>
+                                <p className="text-2xl font-bold">0 GB</p>
                             </div>
                             <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 min-w-[140px]">
                                 <p className="text-xs text-blue-100 mb-1 flex items-center gap-1"><ArrowUp className="h-3 w-3" /> Upload</p>
-                                <p className="text-2xl font-bold">42.6 GB</p>
+                                <p className="text-2xl font-bold">0 GB</p>
                             </div>
                         </div>
                     </div>
@@ -46,83 +133,46 @@ export default function UsagePage() {
             {/* Monthly Chart */}
             <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div className="flex justify-between items-center mb-6">
-                    <h3 className="font-bold text-slate-900 dark:text-white">Daily Consumption (Oct)</h3>
+                    <h3 className="font-bold text-slate-900 dark:text-white">Daily Consumption ({formatMonth(cycleStart)})</h3>
                     <div className="flex items-center gap-2 text-xs text-slate-500">
                         <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-blue-500"></div> Used</span>
                     </div>
                 </div>
 
-                <div className="h-48 flex items-end justify-between gap-1">
-                    {Array.from({ length: 30 }).map((_, i) => {
-                        const height = Math.floor(Math.random() * 80) + 10; // Mock data
-                        const isToday = i === 24;
-                        return (
-                            <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
-                                <div
-                                    className={`w-full rounded-t-sm transition-all duration-300 relative ${isToday ? 'bg-blue-600' : 'bg-slate-100 dark:bg-slate-800 group-hover:bg-blue-400'}`}
-                                    style={{ height: `${height}%` }}
-                                >
-                                    {/* Tooltip */}
-                                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                        {height + 12} GB
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
+                <div className="h-48 flex items-center justify-center text-slate-400 dark:text-slate-500">
+                    <div className="text-center">
+                        <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                        <p className="text-sm">Usage tracking will appear here once your service is active</p>
+                    </div>
                 </div>
                 <div className="flex justify-between text-[10px] text-slate-400 mt-2 border-t border-slate-100 dark:border-slate-800 pt-2">
-                    <span>Oct 1</span>
-                    <span>Oct 15</span>
-                    <span>Oct 30</span>
+                    <span>{formatDate(cycleStart)}</span>
+                    <span>{formatDate(cycleEnd)}</span>
                 </div>
             </div>
 
-            {/* Detailed Session History */}
+            {/* Subscription Details */}
             <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                <h3 className="font-bold text-slate-900 dark:text-white mb-6">Recent Sessions</h3>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-6">Subscription Details</h3>
 
-                <div className="space-y-4">
-                    {[
-                        { device: 'Desktop - Windows', time: 'Active Now', download: '2.4 GB', upload: '150 MB', icon: Laptop, color: 'text-green-500' },
-                        { device: 'iPhone 14 Pro', time: '2 hours ago', download: '450 MB', upload: '20 MB', icon: Smartphone, color: 'text-slate-500' },
-                        { device: 'Smart TV', time: '5 hours ago', download: '8.2 GB', upload: '12 MB', icon: Wifi, color: 'text-slate-500' },
-                        { device: 'MacBook Air', time: 'Yesterday', download: '1.2 GB', upload: '400 MB', icon: Laptop, color: 'text-slate-500' },
-                    ].map((session, i) => (
-                        <div key={i} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
-                            <div className="flex items-center gap-4">
-                                <div className="h-10 w-10 bg-white dark:bg-slate-700 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-400 shadow-sm">
-                                    <session.icon className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <p className="font-bold text-sm text-slate-900 dark:text-white">{session.device}</p>
-                                    <p className={`text-xs flex items-center gap-1 ${session.color}`}>
-                                        <Clock className="h-3 w-3" /> {session.time}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="flex gap-6 text-right">
-                                <div className="hidden sm:block">
-                                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">Download</p>
-                                    <p className="font-bold text-slate-900 dark:text-white text-sm">{session.download}</p>
-                                </div>
-                                <div className="hidden sm:block">
-                                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">Upload</p>
-                                    <p className="font-bold text-slate-900 dark:text-white text-sm">{session.upload}</p>
-                                </div>
-                                <div className="sm:hidden">
-                                    <p className="font-bold text-slate-900 dark:text-white text-sm">{session.download}</p>
-                                    <p className="text-[10px] text-slate-500">Total</p>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Plan</p>
+                        <p className="font-bold text-slate-900 dark:text-white">{data.subscription?.planName}</p>
+                    </div>
+                    <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Speed</p>
+                        <p className="font-bold text-slate-900 dark:text-white">{data.subscription?.speed} Mbps</p>
+                    </div>
+                    <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Billing Cycle</p>
+                        <p className="font-bold text-slate-900 dark:text-white capitalize">{data.subscription?.billingCycle}</p>
+                    </div>
+                    <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Status</p>
+                        <p className="font-bold text-green-600 dark:text-green-400 capitalize">{data.subscription?.status}</p>
+                    </div>
                 </div>
-
-                <button className="w-full mt-6 py-3 text-sm font-bold text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors">
-                    View All History
-                </button>
             </div>
 
         </div>

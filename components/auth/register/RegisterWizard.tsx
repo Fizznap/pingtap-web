@@ -82,9 +82,9 @@ function WizardContent() {
     );
 }
 
-export function RegisterWizard() {
+export function RegisterWizard({ selectedPlanName }: { selectedPlanName?: string }) {
     return (
-        <RegisterProvider>
+        <RegisterProvider initialPlanName={selectedPlanName}>
             <WizardContent />
         </RegisterProvider>
     );

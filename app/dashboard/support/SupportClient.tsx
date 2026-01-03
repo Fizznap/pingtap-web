@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Plus, Search, MessageSquare, ChevronRight, HelpCircle, ChevronDown, Filter, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { createTicket } from '@/app/actions/ticket';
+import { useRouter } from 'next/navigation';
 
 type SupportTicket = {
     id: string;
@@ -22,10 +23,10 @@ const FAQS = [
 ];
 
 export default function SupportClient({ initialTickets }: { initialTickets: SupportTicket[] }) {
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState<'tickets' | 'faq'>('tickets');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [tickets, setTickets] = useState<SupportTicket[]>(initialTickets);
-    // const [loading, setLoading] = useState(false); // No loading state needed initially as we have SSR data
     const [submitting, setSubmitting] = useState(false);
 
     // Form State
@@ -49,16 +50,16 @@ export default function SupportClient({ initialTickets }: { initialTickets: Supp
 
         if (result.error) {
             alert('Failed to create ticket: ' + result.error);
+            setSubmitting(false);
         } else {
             alert('Ticket created successfully!');
             setShowCreateModal(false);
             setFormData({ category: 'Technical Issue', subject: '', description: '' });
-            // Ideally we should just refresh the page data here, 
-            // but for now we rely on revalidatePath in the action to update the SSR data if we refresh.
-            // Or we could append to local state optimistically, but let's stick to safe.
-            window.location.reload();
+
+            // Refresh server data to get the latest tickets
+            router.refresh();
+            setSubmitting(false);
         }
-        setSubmitting(false);
     };
 
     return (
